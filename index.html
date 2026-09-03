@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAQI Soft Solutions - Unified Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Glassmorphism & Monochromatic Smooth Transitions */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #404040; }
+    </style>
+</head>
+<body class="bg-black text-neutral-200 min-h-screen flex flex-col selection:bg-neutral-800 selection:text-white overflow-x-hidden">
+
+    <header class="sticky top-0 z-50 glass-card border-b border-neutral-800/80 px-4 lg:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <button id="menu-toggle" class="lg:hidden text-neutral-400 hover:text-white focus:outline-none p-2 transition-colors">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <a href="https://aaqi.online" target="_blank" class="flex items-center space-x-2 group">
+                <div class="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-700 flex items-center justify-center text-white font-bold group-hover:bg-neutral-800 transition-all shadow-lg">
+                    A
+                </div>
+                <div>
+                    <span class="font-bold text-white tracking-wide block text-sm">AAQI Soft Solutions</span>
+                    <span class="text-[10px] text-neutral-400 block">aaqi.online</span>
+                </div>
+            </a>
+        </div>
+        
+        <div class="hidden md:flex items-center space-x-4 text-xs text-neutral-400">
+            <span class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-neutral-900/80 border border-neutral-800">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>System Active (Auto-Cache Enabled)</span>
+            </span>
+            <button onclick="clearSystemCacheManual()" class="hover:text-white transition-colors underline cursor-pointer">Clear Cache</button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex relative">
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 glass-card border-r border-neutral-800/80 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col pt-20 lg:pt-6 px-4 space-y-6">
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-semibold tracking-wider text-neutral-500 uppercase">Core Modules</p>
+                <nav class="space-y-1 mt-2">
+                    <button onclick="switchView('dashboard')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white bg-neutral-900/90 border border-neutral-800 transition-all">
+                        <i class="fa-solid fa-chart-pie w-5 text-neutral-400"></i>
+                        <span>Dashboard Overview</span>
+                    </button>
+                    <button onclick="switchView('order-tracking')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-white hover:bg-neutral-900/50 transition-all">
+                        <i class="fa-solid fa-truck-fast w-5 text-neutral-400"></i>
+                        <span>Order Tracking</span>
+                    </button>
+                    <button onclick="switchView('order-placement')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-white hover:bg-neutral-900/50 transition-all">
+                        <i class="fa-solid fa-cart-plus w-5 text-neutral-400"></i>
+                        <span>Order Placement</span>
+                    </button>
+                    <button onclick="switchView('invoice-tracking')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-white hover:bg-neutral-900/50 transition-all">
+                        <i class="fa-solid fa-file-invoice-dollar w-5 text-neutral-400"></i>
+                        <span>Invoice Tracking</span>
+                    </button>
+                    <button onclick="switchView('client-finder')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-white hover:bg-neutral-900/50 transition-all">
+                        <i class="fa-solid fa-magnifying-glass-location w-5 text-neutral-400"></i>
+                        <span>Clients Finder</span>
+                    </button>
+                    <button onclick="switchView('email-send')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-white hover:bg-neutral-900/50 transition-all">
+                        <i class="fa-solid fa-paper-plane w-5 text-neutral-400"></i>
+                        <span>Email Sender</span>
+                    </button>
+                    <button onclick="switchView('leads')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-white hover:bg-neutral-900/50 transition-all">
+                        <i class="fa-solid fa-bullseye w-5 text-neutral-400"></i>
+                        <span>Leads Manager</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="mt-auto pb-6">
+                <div class="p-3 rounded-xl glass-card border border-neutral-800 space-y-2">
+                    <p class="text-xs font-semibold text-white">Need Custom Solution?</p>
+                    <p class="text-[11px] text-neutral-400 leading-relaxed">Visit our official portal for specialized software engineering.</p>
+                    <a href="https://aaqi.online" target="_blank" class="inline-block text-xs font-medium text-white bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 rounded-lg transition-colors w-full text-center">
+                        Visit aaqi.online <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden lg:hidden"></div>
+
+        <main class="flex-1 p-4 lg:p-8 overflow-y-auto max-w-7xl mx-auto">
+            
+            <div id="view-dashboard" class="space-y-6 animate-fade">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">System Dashboard</h1>
+                    <p class="text-sm text-neutral-400 mt-1">Overview of your operations, leads, and active services managed via AAQI Soft Solutions.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-5 rounded-2xl relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-medium text-neutral-400">Active Orders</span>
+                            <i class="fa-solid fa-boxes-stacked text-neutral-500"></i>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-2xl font-bold text-white" id="stat-orders">12</h3>
+                            <p class="text-[11px] text-emerald-400 mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> +2 pending update</p>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-medium text-neutral-400">Open Invoices</span>
+                            <i class="fa-solid fa-file-invoice text-neutral-500"></i>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-2xl font-bold text-white" id="stat-invoices">$4,850</h3>
+                            <p class="text-[11px] text-neutral-400 mt-1">2 invoices awaiting clearance</p>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-medium text-neutral-400">Total Leads</span>
+                            <i class="fa-solid fa-users-line text-neutral-500"></i>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-2xl font-bold text-white" id="stat-leads">34</h3>
+                            <p class="text-[11px] text-emerald-400 mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> +5 this week</p>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-medium text-neutral-400">System Status</span>
+                            <i class="fa-solid fa-shield-halved text-neutral-500"></i>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-2xl font-bold text-white">Optimal</h3>
+                            <p class="text-[11px] text-neutral-400 mt-1">Auto-Cache Enabled</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-card p-6 rounded-2xl space-y-4">
+                        <h3 class="font-semibold text-white text-base flex items-center justify-between">
+                            <span>Recent Orders Activity</span>
+                            <a href="https://aaqi.online" target="_blank" class="text-xs text-neutral-400 hover:text-white transition-colors">aaqi.online</a>
+                        </h3>
+                        <div class="space-y-3" id="recent-orders-list">
+                            </div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl space-y-4">
+                        <h3 class="font-semibold text-white text-base">Quick Lead Capture</h3>
+                        <form id="quick-lead-form" onsubmit="handleQuickLead(event)" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-medium text-neutral-400 mb-1">Company / Client Name</label>
+                                <input type="text" id="ql-name" required class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors" placeholder="e.g. Apex Corp">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-neutral-400 mb-1">Service Interested In</label>
+                                <select id="ql-service" class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors">
+                                    <option value="Web Development">Web Development</option>
+                                    <option value="Mobile App">Mobile App Development</option>
+                                    <option value="Graphic Design">Graphic Design</option>
+                                    <option value="SEO & Marketing">SEO & Marketing</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-white hover:bg-neutral-200 text-black font-medium py-2 rounded-xl text-sm transition-colors cursor-pointer">
+                                Add Lead to System
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-order-tracking" class="space-y-6 hidden animate-fade">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">Order Tracking</h1>
+                    <p class="text-sm text-neutral-400 mt-1">Track active software development cycles and milestone progress.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="track-search-input" placeholder="Enter Order ID (e.g., ORD-9402)" class="flex-1 bg-neutral-900/80 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors">
+                        <button onclick="searchOrder()" class="bg-white hover:bg-neutral-200 text-black font-medium px-6 py-2.5 rounded-xl text-sm transition-colors cursor-pointer">
+                            Search Order
+                        </button>
+                    </div>
+                    <div id="order-tracking-result" class="mt-4 space-y-3">
+                        <div class="p-4 rounded-xl bg-neutral-900/50 border border-neutral-800 text-sm text-neutral-400 text-center">
+                            Enter an Order ID above or pick from your recent orders. Link services via <a href="https://aaqi.online" target="_blank" class="underline text-white">aaqi.online</a>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-order-placement" class="space-y-6 hidden animate-fade">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">Order Placement</h1>
+                    <p class="text-sm text-neutral-400 mt-1">Initiate a new project request with AAQI Soft Solutions.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl">
+                    <form id="order-form" onsubmit="submitNewOrder(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-neutral-400 mb-1">Client Full Name</label>
+                                <input type="text" id="ord-client" required class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600" placeholder="John Doe">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-neutral-400 mb-1">Email Address</label>
+                                <input type="email" id="ord-email" required class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600" placeholder="john@example.com">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-neutral-400 mb-1">Select Service Package</label>
+                                <select id="ord-package" class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600">
+                                    <option value="Custom Web App ($1,200)">Custom Web App ($1,200)</option>
+                                    <option value="Mobile App Dev ($2,500)">Mobile App Dev ($2,500)</option>
+                                    <option value="Graphic Design Suite ($450)">Graphic Design Suite ($450)</option>
+                                    <option value="SEO Optimization ($600/mo)">SEO Optimization ($600/mo)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-neutral-400 mb-1">Estimated Timeline</label>
+                                <input type="text" id="ord-timeline" value="2-4 Weeks" class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Project Scope & Requirements</label>
+                            <textarea id="ord-notes" rows="4" class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600" placeholder="Describe your project requirements..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-white hover:bg-neutral-200 text-black font-medium py-3 rounded-xl text-sm transition-colors cursor-pointer">
+                            Submit Order & Generate Invoice
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-invoice-tracking" class="space-y-6 hidden animate-fade">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">Invoice Tracking</h1>
+                    <p class="text-sm text-neutral-400 mt-1">Review billing statuses, payment histories, and outstanding invoices.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-medium text-neutral-400">All Invoices</span>
+                        <a href="https://aaqi.online" target="_blank" class="text-xs text-neutral-400 hover:text-white">Secure Billing via aaqi.online</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-neutral-900/80 text-neutral-400 text-xs uppercase tracking-wider border-b border-neutral-800">
+                                <tr>
+                                    <th class="p-3 rounded-l-xl">Invoice ID</th>
+                                    <th class="p-3">Client</th>
+                                    <th class="p-3">Amount</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 rounded-r-xl text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoice-table-body" class="divide-y divide-neutral-800/50">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-client-finder" class="space-y-6 hidden animate-fade">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">Clients Finder</h1>
+                    <p class="text-sm text-neutral-400 mt-1">Search and manage existing client databases and contacts.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <input type="text" id="client-search-input" oninput="filterClients()" placeholder="Filter clients by name, company or email..." class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" id="client-grid">
+                        </div>
+                </div>
+            </div>
+
+            <div id="view-email-send" class="space-y-6 hidden animate-fade">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">Email Sender</h1>
+                    <p class="text-sm text-neutral-400 mt-1">Dispatch direct notifications or proposals to clients.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl">
+                    <form onsubmit="sendEmailAction(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Recipient Email</label>
+                            <input type="email" id="email-to" required class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600" placeholder="client@domain.com">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Subject Line</label>
+                            <input type="text" id="email-subject" required class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600" placeholder="Project Update / Proposal from AAQI Soft Solutions">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Message Body</label>
+                            <textarea id="email-body" rows="5" required class="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-600" placeholder="Type your message here... You can also reference aaqi.online"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-white hover:bg-neutral-200 text-black font-medium py-3 rounded-xl text-sm transition-colors cursor-pointer">
+                            Send Email Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-leads" class="space-y-6 hidden animate-fade">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-tight text-white">Leads Manager</h1>
+                        <p class="text-sm text-neutral-400 mt-1">Track prospective clients and sales pipelines.</p>
+                    </div>
+                    <button onclick="switchView('order-placement')" class="bg-white hover:bg-neutral-200 text-black font-medium px-4 py-2 rounded-xl text-sm transition-colors cursor-pointer">
+                        Convert Lead to Order
+                    </button>
+                </div>
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="leads-grid">
+                        </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="glass-card border-t border-neutral-800/80 py-4 px-6 text-center text-xs text-neutral-500 mt-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <p>&copy; 2026 AAQI Soft Solutions. All rights reserved.</p>
+        <p>Official Portal: <a href="https://aaqi.online" target="_blank" class="text-white underline hover:text-neutral-300">aaqi.online</a></p>
+    </footer>
+
+    <script>
+        // --- AUTOMATED DAILY CACHE CLEARING SYSTEM ---
+        function checkDailyCache() {
+            const lastClearDate = localStorage.getItem('aaqi_last_cache_clear');
+            const todayStr = new Date().toDateString();
+            if (lastClearDate !== todayStr) {
+                // Clear state cache to ensure smooth operation
+                const keepKeys = ['aaqi_initialized'];
+                Object.keys(localStorage).forEach(key => {
+                    if (!keepKeys.includes(key)) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                localStorage.setItem('aaqi_last_cache_clear', todayStr);
+                console.log('System Cache Auto-Cleared for Today.');
+            }
+        }
+        checkDailyCache();
+
+        function clearSystemCacheManual() {
+            if(confirm('Are you sure you want to clear system cache? Data will reset to default demo state.')) {
+                localStorage.clear();
+                localStorage.setItem('aaqi_last_cache_clear', new Date().toDateString());
+                initAppData();
+                alert('System cache cleared successfully!');
+                location.reload();
+            }
+        }
+
+        // --- MOCK APP DATA STORAGE ---
+        function initAppData() {
+            if (!localStorage.getItem('aaqi_orders')) {
+                const defaultOrders = [
+                    { id: 'ORD-9402', client: 'Nexus Tech', package: 'Custom Web App ($1,200)', status: 'In Progress', date: '2026-09-01' },
+                    { id: 'ORD-9403', client: 'Vertex Media', package: 'Mobile App Dev ($2,500)', status: 'Reviewing', date: '2026-09-02' },
+                    { id: 'ORD-9404', client: 'Solstice Group', package: 'SEO Optimization ($600/mo)', status: 'Completed', date: '2026-08-28' }
+                ];
+                localStorage.setItem('aaqi_orders', JSON.stringify(defaultOrders));
+            }
+            if (!localStorage.getItem('aaqi_invoices')) {
+                const defaultInvoices = [
+                    { id: 'INV-101', client: 'Nexus Tech', amount: '$1,200', status: 'Paid' },
+                    { id: 'INV-102', client: 'Vertex Media', amount: '$2,500', status: 'Pending' },
+                    { id: 'INV-103', client: 'Global Retail', amount: '$850', status: 'Overdue' }
+                ];
+                localStorage.setItem('aaqi_invoices', JSON.stringify(defaultInvoices));
+            }
+            if (!localStorage.getItem('aaqi_clients')) {
+                const defaultClients = [
+                    { name: 'Sarah Jenkins', company: 'Nexus Tech', email: 'sarah@nexustech.io', phone: '+1 (555) 019-2834' },
+                    { name: 'David Miller', company: 'Vertex Media', email: 'david@vertexmedia.com', phone: '+1 (555) 849-2011' },
+                    { name: 'Elena Rostova', company: 'Solstice Group', email: 'elena@solstice.org', phone: '+1 (555) 392-1049' }
+                ];
+                localStorage.setItem('aaqi_clients', JSON.stringify(defaultClients));
+            }
+            if (!localStorage.getItem('aaqi_leads')) {
+                const defaultLeads = [
+                    { name: 'Apex Corp', service: 'Web Development', status: 'Hot Lead' },
+                    { name: 'Nova Logistics', service: 'Mobile App', status: 'Contacted' },
+                    { name: 'Prime Branding', service: 'Graphic Design', status: 'New' }
+                ];
+                localStorage.setItem('aaqi_leads', JSON.stringify(defaultLeads));
+            }
+        }
+        initAppData();
+
+        // --- NAVIGATION & VIEW ROUTING ---
+        const views = ['dashboard', 'order-tracking', 'order-placement', 'invoice-tracking', 'client-finder', 'email-send', 'leads'];
+        
+        function switchView(viewId) {
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(`view-${viewId}`);
+            if (target) target.classList.remove('hidden');
+
+            // Update button styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-neutral-900/90', 'border', 'border-neutral-800', 'text-white');
+                btn.classList.add('text-neutral-400');
+            });
+            event && event.currentTarget && event.currentTarget.classList.add('bg-neutral-900/90', 'border', 'border-neutral-800', 'text-white');
+
+            // Close mobile menu if open
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebar-backdrop').classList.add('hidden');
+
+            // Render view-specific data
+            if (viewId === 'dashboard') renderDashboard();
+            if (viewId === 'invoice-tracking') renderInvoices();
+            if (viewId === 'client-finder') renderClients();
+            if (viewId === 'leads') renderLeads();
+        }
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        });
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.add('hidden');
+        });
+
+        // --- RENDER DYNAMIC DATA ---
+        function renderDashboard() {
+            const orders = JSON.parse(localStorage.getItem('aaqi_orders')) || [];
+            const leads = JSON.parse(localStorage.getItem('aaqi_leads')) || [];
+            const invoices = JSON.parse(localStorage.getItem('aaqi_invoices')) || [];
+
+            document.getElementById('stat-orders').innerText = orders.length;
+            document.getElementById('stat-leads').innerText = leads.length;
+
+            const listEl = document.getElementById('recent-orders-list');
+            listEl.innerHTML = orders.map(o => `
+                <div class="p-3 rounded-xl bg-neutral-900/50 border border-neutral-800 flex items-center justify-between text-xs">
+                    <div>
+                        <span class="font-bold text-white block">${o.id} - ${o.client}</span>
+                        <span class="text-neutral-400">${o.package}</span>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full bg-neutral-800 text-white font-medium">${o.status}</span>
+                </div>
+            `).join('');
+        }
+
+        function searchOrder() {
+            const query = document.getElementById('track-search-input').value.trim().toUpperCase();
+            const orders = JSON.parse(localStorage.getItem('aaqi_orders')) || [];
+            const resultEl = document.getElementById('order-tracking-result');
+
+            const found = orders.find(o => o.id.toUpperCase() === query || o.client.toUpperCase().includes(query));
+            if (found) {
+                resultEl.innerHTML = `
+                    <div class="p-4 rounded-xl bg-neutral-900 border border-neutral-700 space-y-2 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-white">${found.id}</span>
+                            <span class="px-3 py-1 rounded-full bg-neutral-800 text-emerald-400 font-medium text-xs">${found.status}</span>
+                        </div>
+                        <p class="text-neutral-300">Client: <span class="text-white">${found.client}</span></p>
+                        <p class="text-neutral-300">Package: <span class="text-white">${found.package}</span></p>
+                        <p class="text-neutral-400 text-xs">Initiated on: ${found.date} | Managed via <a href="https://aaqi.online" target="_blank" class="underline text-white">aaqi.online</a></p>
+                    </div>
+                `;
+            } else {
+                resultEl.innerHTML = `<div class="p-4 rounded-xl bg-neutral-900/50 border border-neutral-800 text-sm text-neutral-400 text-center">No order found matching "${query}".</div>`;
+            }
+        }
+
+        function submitNewOrder(e) {
+            e.preventDefault();
+            const client = document.getElementById('ord-client').value;
+            const email = document.getElementById('ord-email').value;
+            const pkg = document.getElementById('ord-package').value;
+            
+            const orders = JSON.parse(localStorage.getItem('aaqi_orders')) || [];
+            const newId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+            
+            orders.unshift({ id: newId, client, package: pkg, status: 'Processing', date: new Date().toISOString().split('T')[0] });
+            localStorage.setItem('aaqi_orders', JSON.stringify(orders));
+
+            alert(`Order ${newId} placed successfully for ${client}! Verified through aaqi.online infrastructure.`);
+            document.getElementById('order-form').reset();
+            switchView('order-tracking');
+        }
+
+        function renderInvoices() {
+            const invoices = JSON.parse(localStorage.getItem('aaqi_invoices')) || [];
+            const tbody = document.getElementById('invoice-table-body');
+            tbody.innerHTML = invoices.map(i => `
+                <tr class="hover:bg-neutral-900/40 transition-colors">
+                    <td class="p-3 font-medium text-white">${i.id}</td>
+                    <td class="p-3 text-neutral-300">${i.client}</td>
+                    <td class="p-3 text-neutral-300">${i.amount}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium ${i.status === 'Paid' ? 'bg-neutral-800 text-emerald-400' : 'bg-neutral-800 text-amber-400'}">${i.status}</span>
+                    </td>
+                    <td class="p-3 text-right">
+                        <a href="https://aaqi.online" target="_blank" class="text-xs text-neutral-400 hover:text-white underline">View Details</a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderClients() {
+            const clients = JSON.parse(localStorage.getItem('aaqi_clients')) || [];
+            const grid = document.getElementById('client-grid');
+            grid.innerHTML = clients.map(c => `
+                <div class="glass-card p-4 rounded-xl space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-bold text-white text-sm">${c.name}</h4>
+                        <span class="text-xs text-neutral-400">${c.company}</span>
+                    </div>
+                    <p class="text-xs text-neutral-300"><i class="fa-solid fa-envelope mr-1.5 text-neutral-500"></i> ${c.email}</p>
+                    <p class="text-xs text-neutral-300"><i class="fa-solid fa-phone mr-1.5 text-neutral-500"></i> ${c.phone}</p>
+                </div>
+            `).join('');
+        }
+
+        function filterClients() {
+            const query = document.getElementById('client-search-input').value.toLowerCase();
+            const clients = JSON.parse(localStorage.getItem('aaqi_clients')) || [];
+            const filtered = clients.filter(c => c.name.toLowerCase().includes(query) || c.company.toLowerCase().includes(query) || c.email.toLowerCase().includes(query));
+            const grid = document.getElementById('client-grid');
+            grid.innerHTML = filtered.map(c => `
+                <div class="glass-card p-4 rounded-xl space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-bold text-white text-sm">${c.name}</h4>
+                        <span class="text-xs text-neutral-400">${c.company}</span>
+                    </div>
+                    <p class="text-xs text-neutral-300"><i class="fa-solid fa-envelope mr-1.5 text-neutral-500"></i> ${c.email}</p>
+                    <p class="text-xs text-neutral-300"><i class="fa-solid fa-phone mr-1.5 text-neutral-500"></i> ${c.phone}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderLeads() {
+            const leads = JSON.parse(localStorage.getItem('aaqi_leads')) || [];
+            const grid = document.getElementById('leads-grid');
+            grid.innerHTML = leads.map(l => `
+                <div class="glass-card p-5 rounded-xl space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-bold text-white text-sm">${l.name}</h4>
+                        <span class="px-2.5 py-1 rounded-full bg-neutral-800 text-white text-[11px] font-medium">${l.status}</span>
+                    </div>
+                    <p class="text-xs text-neutral-300">Service Interest: <span class="text-white">${l.service}</span></p>
+                    <a href="https://aaqi.online" target="_blank" class="block text-center text-xs text-neutral-400 hover:text-white bg-neutral-900 py-1.5 rounded-lg border border-neutral-800 transition-colors">Manage via aaqi.online</a>
+                </div>
+            `).join('');
+        }
+
+        function handleQuickLead(e) {
+            e.preventDefault();
+            const name = document.getElementById('ql-name').value;
+            const service = document.getElementById('ql-service').value;
+            const leads = JSON.parse(localStorage.getItem('aaqi_leads')) || [];
+            
+            leads.unshift({ name, service, status: 'New Lead' });
+            localStorage.setItem('aaqi_leads', JSON.stringify(leads));
+
+            alert(`Lead "${name}" successfully added to system database.`);
+            document.getElementById('quick-lead-form').reset();
+            renderDashboard();
+        }
+
+        function emailSendAction(e) {
+            e.preventDefault();
+            alert('Email transmission simulated successfully through aaqi.online SMTP gateway.');
+            e.target.reset();
+        }
+
+        // Initialize dashboard view on load
+        renderDashboard();
+    </script>
+</body>
+</html>
